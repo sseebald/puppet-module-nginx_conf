@@ -20,10 +20,11 @@ class nginx_conf(
 
 
     #update nginx.conf file to host over port 8081, and serve custom web content
-    file {"nginx default config":
+    file {"nginx html config":
       ensure	=>	file,
       path	=>	"/etc/nginx/conf.d/default.conf",
       source	=>	"puppet:///modules/nginx_conf/default.conf",
+      require	=>	Package["install nginx"],
     }
 
 
@@ -39,17 +40,41 @@ class nginx_conf(
     user {"nginx-user add":
       ensure	=>	present,
       name	=>	"nginx-user",
-      uid		=>	777,
-      gid		=>	777,
+      uid	=>	777,
+      gid	=>	777,
       shell	=>	"/bin/bash",
       home	=>	"/home/nginx-user",
     } 
 
 
-    #restart the service when the nginx.conf file changes
+    file {"nginx default config":
+      ensure	=>	file,
+      path	=>	"/etc/nginx/nginx.conf",
+      source	=>	"puppet:///nginx_conf/nginx.conf",
+      require	=>	Package["install nginx"],
+    }
+
+
+    file {"html root dir":
+      ensure	=> 	directory,
+      path	=>	"/usr/share/nginx/html",
+      owner	=>	"nginx-user",
+      group	=>	"nginx-user",
+    }
+
+ 
+    file {"html index file":
+      ensure	=>	file,
+      path	=>	"/usr/share/nginx/html/index.html",
+      source	=>	"puppet:///nginx_conf/index.html",
+      owner	=>	"nginx-user",
+      group	=>	"nginx-user",
+    }
+
+
     service {"nginx":
-      ensure 	=>	running,
-      subscribe	=>	File["nginx default config"],   
+      ensure	=> 	running,
+      subscribe	=>	File["nginx default config"],
     }
   }
   else {
@@ -70,6 +95,20 @@ class nginx_conf(
     package {"remove nginx":
       ensure 	=> 	absent,
       name	=>	"nginx",
+    }
+
+    file {"nginx default config remove":
+      ensure	=>	absent,
+      path	=>	"/etc/nginx/",
+      recurse	=>	true,
+      force	=>	true,
+    }
+
+    file {"html root dir remove":
+      ensure	=> 	absent,
+      path	=>	"/usr/share/nginx/html",
+      recurse	=>	true,
+      force	=>	true,
     }
   }
 }
