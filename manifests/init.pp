@@ -46,7 +46,7 @@ class nginx_conf(
       home	=>	"/home/nginx-user",
     } 
 
-
+    #create nginx default config, use our templated version
     file {"nginx default config":
       ensure	=>	file,
       path	=>	"/etc/nginx/nginx.conf",
@@ -54,7 +54,7 @@ class nginx_conf(
       require	=>	Package["install nginx"],
     }
 
-
+    #ensure the html root directory exists
     file {"html root dir":
       ensure	=> 	directory,
       path	=>	"/usr/share/nginx/html",
@@ -62,7 +62,7 @@ class nginx_conf(
       group	=>	"nginx-user",
     }
 
- 
+    #put our index.html file in place
     file {"html index file":
       ensure	=>	file,
       path	=>	"/usr/share/nginx/html/index.html",
@@ -71,7 +71,7 @@ class nginx_conf(
       group	=>	"nginx-user",
     }
 
-
+    #make sure the service is running and subscribed to any changes to the confifile
     service {"nginx":
       ensure	=> 	running,
       subscribe	=>	File["nginx default config"],
@@ -96,7 +96,8 @@ class nginx_conf(
       ensure 	=> 	absent,
       name	=>	"nginx",
     }
-
+    
+    #remove the config dir
     file {"nginx default config remove":
       ensure	=>	absent,
       path	=>	"/etc/nginx/",
@@ -104,6 +105,7 @@ class nginx_conf(
       force	=>	true,
     }
 
+    #remove the html root dir
     file {"html root dir remove":
       ensure	=> 	absent,
       path	=>	"/usr/share/nginx/html",
