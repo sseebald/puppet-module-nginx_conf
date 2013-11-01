@@ -32,7 +32,7 @@ class nginx_conf(
     group {"nginx-user group add":
       ensure	=>	present,
       name	=>	"nginx-user",
-      gid		=>	777,
+      gid	=>	777,
     }
 
 
@@ -50,7 +50,7 @@ class nginx_conf(
     file {"nginx default config":
       ensure	=>	file,
       path	=>	"/etc/nginx/nginx.conf",
-      source	=>	"puppet:///nginx_conf/nginx.conf",
+      source	=>	"puppet:///modules/nginx_conf/nginx.conf",
       require	=>	Package["install nginx"],
     }
 
@@ -66,7 +66,7 @@ class nginx_conf(
     file {"html index file":
       ensure	=>	file,
       path	=>	"/usr/share/nginx/html/index.html",
-      source	=>	"puppet:///nginx_conf/index.html",
+      source	=>	"puppet:///modules/nginx_conf/index.html",
       owner	=>	"nginx-user",
       group	=>	"nginx-user",
     }
